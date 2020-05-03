@@ -14,7 +14,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+import socket
+
+class aircraftPos:
+	def __init__(self, lat, lon, alt):
+		self.lat = lat
+		self.lon = lon
+		self.alt = alt
+
 class connection:
-	def sendData(wp):
-		# TODO
-		pass
+	def __init__(self, conf):
+		try:
+			self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			self.sock.bind('0.0.0.0', conf.localPort)
+		except:
+			print("ERROR: Unable to open socket")
+	def sendData(self, wp):
+		wpt = '{:f},{:f}'.format(wp.lat, wp.lon)
+		for w in wp:
+			wpt += ',{:f},{:f}'.format(w.direction, w.speed)
+		self.sock.sendto(wpt.encode(), (conf.host, conf.port))
+	def receiveData(self):
+		msg, addr = self.sock.recvfrom(1024);
+		lat, lon, alt = msg.split(,)
+		return aircraftPos(lat, lon, alt)
